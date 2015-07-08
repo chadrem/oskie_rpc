@@ -6,7 +6,7 @@ Design goals include:
 - Transport independent so no dependencies on TCP/IP, IO, or any other classes (it simply takes input and gives back output through callbacks).
 - Modular design using the [Filter Chain](https://github.com/chadrem/filter_chain) gem so that the protocol can be modified if you so desire.
 - Supports both messages and requests (requests can be replied to, messages can't).
-- Very simple binary protocol with data encoded in JSON (can easily support alternative serialization and even compression formats).
+- Very simple binary protocol with data encoded in JSON (you can easily change encoding formats).
 - Thread safe.
 - Easy to port to other languages.
 
