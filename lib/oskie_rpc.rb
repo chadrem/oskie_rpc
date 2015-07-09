@@ -5,7 +5,6 @@ require "filter_chain"
 
 require "oskie_rpc/version"
 require "oskie_rpc/exceptions"
-require "oskie_rpc/envelope"
 require "oskie_rpc/message"
 require "oskie_rpc/request"
 require "oskie_rpc/response"

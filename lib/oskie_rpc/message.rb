@@ -11,18 +11,21 @@ module OskieRpc
     end
 
     def load(payload)
-      @command = payload['command']
-      @params = payload['params']
-      @message_id = payload['messageId']
+      @command = payload['message']['command']
+      @params = payload['message']['params']
+      @message_id = payload['message']['messageId']
 
       self
     end
 
     def dump
       {
-        'command' => @command,
-        'params' => @params,
-        'messageId' => @message_id
+        'type' => 'rpcMessage',
+        'message' => {
+          'command' => @command,
+          'params' => @params,
+          'messageId' => @message_id
+        }
       }
     end
   end

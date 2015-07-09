@@ -30,12 +30,10 @@ module OskieRpc
       nil
     end
 
-    def deliver(message)
+    def deliver(delivery)
       @lock.synchronize do
         raise InvalidStateError unless @state == :initialized
-        raise InvalidClassError, message.class.name unless message.is_a?(OskieRpc::Message)
-        envelope = envelope_class.new(message)
-        @output_chain << envelope.dump
+        @output_chain << delivery.dump
       end
 
       nil
@@ -52,7 +50,7 @@ module OskieRpc
         chain.add(FilterChain::DemultiplexFilter.new)
         chain.add(FilterChain::DeserializeFilter.new(:format => :json))
         chain.add(FilterChain::ProcFilter.new { |payload| payload_handler(payload) })
-        chain.add(FilterChain::Terminator.new { |message| message_handler(message) })
+        chain.add(FilterChain::Terminator.new { |delivery| delivery_handler(delivery) })
       end
     end
 
@@ -65,19 +63,24 @@ module OskieRpc
     end
 
     def payload_handler(payload)
-      envelope = envelope_class.new
-      envelope.load(payload)
+      message = case payload['type']
+      when 'rpcMessage' then Message.new
+      when 'rpcRequest' then Request.new
+      when 'rpcResponse' then Response.new
+      else
+        raise UnknownPayloadTypeError, payload['type']
+      end
 
-      envelope.message
+      message.load(payload)
     end
 
-    def message_handler(message)
-      case message
-      when Request then @callbacks[:request].call(message)
+    def delivery_handler(delivery)
+      case delivery
+      when Message then @callbacks[:message].call(delivery)
+      when Request then @callbacks[:request].call(delivery)
       when Response then raise 'Coming soon'
-      when Message then @callbacks[:message].call(message)
       else
-        raise UnknownMessageClassError, message.class.name
+        raise UnknownDeliveryClassError, message.class.name
       end
     end
 
