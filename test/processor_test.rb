@@ -9,6 +9,10 @@ class ProcessorTest < Minitest::Test
         raise 'This should never happen.'
       end
 
+      p.on(:request) do |request|
+        raise 'This should never happen.'
+      end
+
       p.on(:output) do |output|
         test_output << output    
       end
@@ -25,7 +29,11 @@ class ProcessorTest < Minitest::Test
 
     processor = OskieRpc::Processor.new do |p|
       p.on(:message) do |message|
-        test_output = message
+        raise 'This should never happen.'
+      end
+
+      p.on(:request) do |request|
+        test_output = request
       end
 
       p.on(:output) do |output|

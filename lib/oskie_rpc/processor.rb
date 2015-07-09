@@ -8,6 +8,7 @@ module OskieRpc
       @state = :initializing
       block.call(self) if block
       raise MissingCallbackError, :message unless @callbacks[:message]
+      raise MissingCallbackError, :request unless @callbacks[:request]
       raise MissingCallbackError, :output unless @callbacks[:output]
       @state = :initialized
     end
@@ -71,7 +72,13 @@ module OskieRpc
     end
 
     def message_handler(message)
-      @callbacks[:message].call(message)
+      case message
+      when Request then @callbacks[:request].call(message)
+      when Response then raise 'Coming soon'
+      when Message then @callbacks[:message].call(message)
+      else
+        raise UnknownMessageClassError, message.class.name
+      end
     end
 
     def output_handler(bytes)

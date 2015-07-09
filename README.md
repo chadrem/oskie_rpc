@@ -24,9 +24,53 @@ Or install it yourself as:
 
     $ gem install oskie_rpc
 
-## Usage
+## Messages
 
+The ````Message```` class is the basic unit of work for Oskie RPC.
+Messages contain a few simple pieces of data:
+
+- ````command````: The command lets you distinguish different types of messages.  An example is ````'chat'```` for a chat message.
+- ````params````: Optional data you pass in addition to a command.  An example is ````{'message' => 'hello world'}```` for a chat message.
+
+Messages are fire-and-forget.
+
+## Requests
+
+The ````Request```` class is a specialized type of message that expects a response.
+You use these if you need a return value value from the other end.
 Coming soon.
+
+## Responses
+
+The ````Response```` class is used to respond to a request.
+Coming soon.
+
+## Processors
+
+The ````Processor```` class is the engine for Oskie RPC.
+It is network agnostic and simply takes input, generates output, and executes callbacks.
+
+    # Create a processor and define its callbacks.
+    processor = OskieRpc::Processor.new do |p|
+      p.on(:message) do |message|
+        puts "Received message: #{message.inspect}"
+      end
+
+      p.on(:request) do |request|
+        puts "Received request: #{request.inspect}"
+      end
+
+      p.on(:output) do |output|
+        puts "Generated output: #{output.inspect}"
+      end
+    end
+
+    # Send a message.
+    message = OskieRpc::Message.new('hello', {'foo' => 'bar'})
+    processor.deliver(message)
+
+    # Simulate receiving a message.
+    processor << "\u0000\u0000\u0000U{\"type\":\"rpcMessage\",\"message\":{\"command\":\"foo\",\"params\":{},\"messageId\":\"hardcoded\"}}"
 
 ## Contributing
 
