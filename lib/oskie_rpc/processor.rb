@@ -32,7 +32,7 @@ module OskieRpc
     def deliver(message)
       @lock.synchronize do
         raise InvalidStateError unless @state == :initialized
-        raise InvalidClass, message.class.name unless message.is_a?(OskieRpc::Message)
+        raise InvalidClassError, message.class.name unless message.is_a?(OskieRpc::Message)
         envelope = envelope_class.new(message)
         @output_chain << envelope.dump
       end
@@ -50,7 +50,7 @@ module OskieRpc
       FilterChain::Chain.new do |chain|
         chain.add(FilterChain::DemultiplexFilter.new)
         chain.add(FilterChain::DeserializeFilter.new(:format => :json))
-        chain.add(FilterChain::ProcFilter.new { |contents| contents_handler(contents) })
+        chain.add(FilterChain::ProcFilter.new { |payload| payload_handler(payload) })
         chain.add(FilterChain::Terminator.new { |message| message_handler(message) })
       end
     end
@@ -63,9 +63,9 @@ module OskieRpc
       end
     end
 
-    def contents_handler(contents)
+    def payload_handler(payload)
       envelope = Envelope.new
-      envelope.load(contents)
+      envelope.load(payload)
 
       envelope.message
     end

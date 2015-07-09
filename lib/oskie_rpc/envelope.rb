@@ -6,16 +6,16 @@ module OskieRpc
       @message = message
     end
 
-    def load(contents)
-      @message = case contents['type']
+    def load(payload)
+      @message = case payload['type']
       when 'rpcMessage' then Message.new
       when 'rpcRequest' then Request.new
       when 'rpcResponse' then Response.new
       else
-        raise UnknownMessageType, contents['type']
+        raise UnknownMessageTypeError, payload['type']
       end
 
-      @message.load(contents[namespace])
+      @message.load(payload[namespace])
 
       self
     end
@@ -31,17 +31,21 @@ module OskieRpc
 
     def type
       case @message
-      when Message then 'rpcMessage'
       when Request then 'rpcRequest'
       when Response then 'rpcResponse'
+      when Message then 'rpcMessage'
+      else
+        raise UnknownMessageClassError, @message.class.name
       end
     end
 
     def namespace
       case type
+      when 'rpcRequest' then 'request'
+      when 'rpcResponse' then 'response'
       when 'rpcMessage' then 'message'
-      when 'rpcRequest' then 'rpcRequest'
-      when 'rpcResponse' then 'rpcResponse'
+      else
+        raise UnknownMessageNamespaceError, @message.class.name
       end
     end
   end

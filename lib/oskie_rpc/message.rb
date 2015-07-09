@@ -3,7 +3,6 @@ module OskieRpc
     attr_accessor :command
     attr_accessor :params
     attr_accessor :message_id
-    attr_accessor :processor
 
     def initialize(command = '', params = {})
       @command = command
@@ -11,10 +10,10 @@ module OskieRpc
       @message_id = SecureRandom.uuid
     end
 
-    def load(contents)
-      @command = contents['command']
-      @params = contents['params']
-      @message_id = contents['messageId']
+    def load(payload)
+      @command = payload['command']
+      @params = payload['params']
+      @message_id = payload['messageId']
 
       self
     end

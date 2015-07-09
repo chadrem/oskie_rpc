@@ -33,9 +33,8 @@ class ProcessorTest < Minitest::Test
       end
     end
 
-    processor << "\u0000\u0000\u0000U{\"type\":\"rpcMessage\",\"message\":{\"command\":\"foo\",\"params\":{},\"messageId\":\"hardcoded\"}}"
-
-    assert_instance_of(OskieRpc::Message, test_output)
+    processor << "\u0000\u0000\u0000U{\"type\":\"rpcRequest\",\"request\":{\"command\":\"foo\",\"params\":{},\"messageId\":\"hardcoded\"}}"
+    assert_instance_of(OskieRpc::Request, test_output)
     assert_equal("foo", test_output.command)
     assert_equal({}, test_output.params)
     assert_equal("hardcoded", test_output.message_id)
