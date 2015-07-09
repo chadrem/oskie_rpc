@@ -14,9 +14,10 @@ class ProcessorTest < Minitest::Test
       end
     end
 
-    processor.deliver({'foo' => 'bar'})
-
-    assert_equal("\u0000\u0000\u0000\r{\"foo\":\"bar\"}", test_output)
+    message = OskieRpc::Message.new('foo')
+    message.message_id = 'hardcoded'
+    processor.deliver(message)
+    assert_equal("\u0000\u0000\u0000U{\"type\":\"rpcMessage\",\"message\":{\"command\":\"foo\",\"params\":{},\"messageId\":\"hardcoded\"}}", test_output)
   end
 
   def test_input
@@ -32,9 +33,11 @@ class ProcessorTest < Minitest::Test
       end
     end
 
-    processor << "\u0000\u0000"
-    processor << "\u0000\r{\"foo\":\"bar\"}"
+    processor << "\u0000\u0000\u0000U{\"type\":\"rpcMessage\",\"message\":{\"command\":\"foo\",\"params\":{},\"messageId\":\"hardcoded\"}}"
 
-    assert_equal({'foo' => 'bar'}, test_output)
+    assert_instance_of(OskieRpc::Message, test_output)
+    assert_equal("foo", test_output.command)
+    assert_equal({}, test_output.params)
+    assert_equal("hardcoded", test_output.message_id)
   end
 end

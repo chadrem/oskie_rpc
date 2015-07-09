@@ -1,22 +1,29 @@
 module OskieRpc
   class Message
-    attr_reader :command
-    attr_reader :uuid
-    attr_reader :data
-    attr_reader :processor
+    attr_accessor :command
+    attr_accessor :params
+    attr_accessor :message_id
+    attr_accessor :processor
 
-    def initialize(command, opts = {})
+    def initialize(command = '', params = {})
       @command = command
-      @uuid = opts[:uuid] || SecureRandom.uuid
-      @data = opts[:data]
-      @parser = opts[:processor]
+      @params = params
+      @message_id = SecureRandom.uuid
     end
 
-    def to_hash
+    def load(contents)
+      @command = contents['command']
+      @params = contents['params']
+      @message_id = contents['messageId']
+
+      self
+    end
+
+    def dump
       {
-        :command => @command,
-        :uuid => @uuid,
-        :data => @data
+        'command' => @command,
+        'params' => @params,
+        'messageId' => @message_id
       }
     end
   end
