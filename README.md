@@ -29,8 +29,8 @@ Or install it yourself as:
 The ````Message```` class is the basic unit of work for Oskie RPC.
 Messages contain a few simple pieces of data:
 
-- ````command````: The command lets you distinguish different types of messages.  An example is ````'chat'```` for a chat message.
-- ````params````: Optional data you pass in addition to a command.  An example is ````{'message' => 'hello world'}```` for a chat message.
+- ````command````: This is how you distinguish different types of messages.
+- ````params````: Optional data you pass in addition to a command.
 
 Messages are fire-and-forget.
 
