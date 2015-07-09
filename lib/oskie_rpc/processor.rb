@@ -65,7 +65,7 @@ module OskieRpc
     end
 
     def payload_handler(payload)
-      envelope = Envelope.new
+      envelope = envelope_class.new
       envelope.load(payload)
 
       envelope.message
