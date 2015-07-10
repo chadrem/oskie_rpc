@@ -11,10 +11,14 @@ module OskieRpc
       @result = payload['response']['result']
       @message_id = payload['response']['messageId']
 
+      validate!
+
       self
     end
 
     def dump
+      validate!
+
       {
         'type' => 'rpcResponse',
         'response' => {
@@ -22,6 +26,12 @@ module OskieRpc
           'messageId' => @message_id
         }
       }
+    end
+
+    def validate!
+      @message_id.is_a?(String) || raise(ValidationError, "Message ID is not a string.")
+
+      nil
     end
   end
 end

@@ -22,10 +22,14 @@ module OskieRpc
       @params = payload['request']['params']
       @message_id = payload['request']['messageId']
 
+      validate!
+
       self
     end
 
     def dump
+      validate!
+
       {
         'type' => 'rpcRequest',
         'request' => {
@@ -53,6 +57,14 @@ module OskieRpc
       response = Response.new(message_id)
       response.result = yield
       @processor.deliver(response)
+
+      nil
+    end
+
+    def validate!
+      @command.is_a?(String) || raise(ValidationError, "Command is not a string.")
+      @params.is_a?(Hash) || raise(ValidationError, "Params is not a hash.")
+      @message_id.is_a?(String) || raise(ValidationError, "Message ID is not a string.")
 
       nil
     end

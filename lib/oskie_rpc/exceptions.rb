@@ -4,4 +4,5 @@ module OskieRpc
   class InvalidStateError < OskieRpcError; end
   class UnknownPayloadTypeError < OskieRpcError; end
   class UnknownDeliveryClassError < OskieRpcError; end
+  class ValidationError < OskieRpcError; end
 end
