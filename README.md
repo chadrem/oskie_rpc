@@ -45,7 +45,6 @@ The default timeout is 60 seconds.
 ## Responses
 
 The ````Response```` class is used to respond to a request.
-
 In general you don't work directly with this class.
 Responses are sent using the ````respond```` method on a request object.
 
@@ -85,8 +84,9 @@ It is network agnostic and simply takes input, generates output, and executes ca
 #### Heartbeats
 
 Processors require an external clock signal to properly timeout requests.
-This is done on purpose so that you can integrate with the timers provided by your networking framework or create your own using a dedicated thread.
-Your clock should call the processors ````heartbeat```` method to signal that time has changed.
+This is done on purpose so that you can integrate with the timers provided by your networking framework.
+An alternative is to create your own clock using a dedicated thread that periodically wakes up.
+Your clock should call the processor's ````heartbeat```` method to signal that time has changed.
 A good rule of thumb is to call this method once per second.
 
 ## Contributing
