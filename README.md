@@ -8,6 +8,7 @@ Design goals include:
 - Supports both messages and requests (requests can be replied to, messages can't).
 - Very simple binary protocol with data encoded in JSON.
 - Easy to port to other languages.
+- Bi-directional.
 - Thread safe.
 
 ## Installation
@@ -38,12 +39,15 @@ Messages are fire-and-forget.
 
 The ````Request```` class is a specialized type of message that expects a response.
 You use these if you need a return value value from the other end.
-Coming soon.
+Requests support timeouts (see below section on heartbeats).
+The default timeout is 60 seconds.
 
 ## Responses
 
 The ````Response```` class is used to respond to a request.
-Coming soon.
+
+In general you don't work directly with this class.
+Responses are sent using the ````respond``` method on a request object.
 
 ## Processors
 
@@ -58,6 +62,12 @@ It is network agnostic and simply takes input, generates output, and executes ca
 
       p.on(:request) do |request|
         puts "Received request: #{request.inspect}"
+        case request.command
+        when 'echo'
+          request.respond do
+            request.params # Last expression of the block is the return value.
+          end
+        end
       end
 
       p.on(:output) do |output|
@@ -66,11 +76,18 @@ It is network agnostic and simply takes input, generates output, and executes ca
     end
 
     # Send a message.
-    message = OskieRpc::Message.new('hello', {'foo' => 'bar'})
+    message = OskieRpc::Message.new('chat', 'hello world')
     processor.deliver(message)
 
-    # Simulate receiving a message.
-    processor << "\u0000\u0000\u0000U{\"type\":\"rpcMessage\",\"message\":{\"command\":\"foo\",\"params\":{},\"messageId\":\"hardcoded\"}}"
+    # Simulate receiving a request.
+    processor << "\x00\x00\x00|{\"type\":\"rpcRequest\",\"request\":{\"command\":\"echo\",\"params\":\"hello world\",\"messageId\":\"6aa5f623-5823-4c54-a8db-cf911e9aecf8\"}}"
+
+#### Heartbeats
+
+Processors require an external clock signal to properly timeout requests.
+This is done on purpose so that you can integrate with the timers provided by your networking framework or create your own using a dedicated thread.
+Your clock should call the processors ````heartbeat```` method to signal that time has changed.
+A good rule of thumb is to call this method once per second.
 
 ## Contributing
 
