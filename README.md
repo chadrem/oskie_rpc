@@ -1,4 +1,4 @@
-# Oskie RPC [![Build Status](https://travis-ci.org/chadrem/oskie_rpc.svg)](https://travis-ci.org/chadrem/oskie_rpc)
+# Oskie RPC [![Build Status](https://travis-ci.org/chadrem/oskie_rpc.svg)](https://travis-ci.org/chadrem/oskie_rpc) [![Coverage Status](https://coveralls.io/repos/chadrem/oskie_rpc/badge.svg?branch=master&service=github)](https://coveralls.io/github/chadrem/oskie_rpc?branch=master)
 
 Oskie RPC is an extremely simple and modular RPC library for Ruby.
 Design goals include:
