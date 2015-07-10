@@ -1,7 +1,6 @@
 module OskieRpc
-  class Response
+  class Response < Package
     attr_accessor :result
-    attr_accessor :message_id
 
     def initialize(message_id = nil, result = nil)
       @message_id = message_id

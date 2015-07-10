@@ -1,8 +1,7 @@
 module OskieRpc
-  class Message
+  class Message < Package
     attr_accessor :command
     attr_accessor :params
-    attr_accessor :message_id
 
     def initialize(command = '', params = {})
       @command = command

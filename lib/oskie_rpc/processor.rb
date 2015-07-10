@@ -1,10 +1,11 @@
 module OskieRpc
   class Processor
     def initialize(&block)
-      @lock = Mutex.new
+      @lock = Monitor.new
       @input_chain = create_input_chain
       @output_chain = create_output_chain
       @callbacks = {}
+      @requests = SortedSet.new
       @state = :initializing
       block.call(self) if block
       raise MissingCallbackError, :message unless @callbacks[:message]
@@ -33,17 +34,34 @@ module OskieRpc
     def deliver(delivery)
       @lock.synchronize do
         raise InvalidStateError unless @state == :initialized
+
+        if delivery.is_a?(Request)
+          delivery.__request_sent
+          @requests << delivery
+        end
+
         @output_chain << delivery.dump
       end
 
       nil
     end
 
-    private
+    def heartbeat
+      @lock.synchronize do
+        @requests.each do |request|
+          if request.timed_out?
+            @requests.delete(request)
+            request.__response_failed
+          else
+            return
+          end
+        end
+      end
 
-    def envelope_class
-      Envelope
+      nil
     end
+
+    private
 
     def create_input_chain
       FilterChain::Chain.new do |chain|
@@ -76,13 +94,30 @@ module OskieRpc
 
     def delivery_handler(delivery)
       case delivery
-      when Message then @callbacks[:message].call(delivery)
-      when Request then @callbacks[:request].call(delivery)
-      when Response then raise 'Coming soon'
+      when Message then message_handler(delivery)
+      when Request then request_handler(delivery)
+      when Response then response_handler(delivery)
       else
         raise UnknownDeliveryClassError, message.class.name
       end
     end
+
+    def message_handler(message)
+      @callbacks[:message].call(message)
+    end
+
+    def request_handler(request)
+      request.__request_received(self)
+      @callbacks[:request].call(request)
+    end
+
+    def response_handler(response)
+      request = @requests.find { |request| request.message_id == response.message_id }
+      return unless request
+      @requests.delete(request) 
+      request.__response_received(response)
+    end
+
 
     def output_handler(bytes)
       @callbacks[:output].call(bytes)
