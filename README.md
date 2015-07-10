@@ -78,7 +78,7 @@ It is network agnostic and simply takes input, generates output, and executes ca
     message = OskieRpc::Message.new('chat', :message => 'hello world')
     processor.deliver(message)
 
-    # Simulate receiving a request.
+    # Simulate receiving a request (it will be echo'ed back).
     processor << "\x00\x00\x00|{\"type\":\"rpcRequest\",\"request\":{\"command\":\"echo\",\"params\":{\"foo\":\"bar\"},\"messageId\":\"6c10b3ed-9f07-44c2-8f12-3e04cb7792e2\"}}"
 
 #### Heartbeats
