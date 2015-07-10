@@ -38,7 +38,7 @@ Messages are fire-and-forget.
 ## Requests
 
 The ````Request```` class is a specialized type of message that expects a response.
-You use these if you need a return value value from the other end.
+You use them if you need a return value value from the other end.
 Requests support timeouts (see below section on heartbeats).
 The default timeout is 60 seconds.
 
@@ -47,7 +47,7 @@ The default timeout is 60 seconds.
 The ````Response```` class is used to respond to a request.
 
 In general you don't work directly with this class.
-Responses are sent using the ````respond``` method on a request object.
+Responses are sent using the ````respond```` method on a request object.
 
 ## Processors
 
